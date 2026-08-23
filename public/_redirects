@@ -1,0 +1,9 @@
+# SPA fallback — every unmatched path goes to the SSR function. The
+# netlify.toml already declares this redirect, but having a public/_redirects
+# file is a belt-and-braces measure that keeps the rewrite working even if
+# the netlify.toml redirect ever gets removed from the build.
+#
+# Nitro 3's Netlify preset writes the SSR handler to
+# `.netlify/functions-internal/server` (Functions v2). Plain `/.netlify/functions/...`
+# paths go to the Functions v1 router which no longer applies.
+/*    /.netlify/functions-internal/server   200
