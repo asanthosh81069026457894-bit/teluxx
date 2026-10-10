@@ -14,16 +14,16 @@
   # vite.config.ts selects this preset at build time.
   command = "npm run build"
   # Static client assets. The SSR function lives at
-  # `.netlify/functions-internal/server` and is auto-discovered by Netlify.
+  # `.netlify/functions-internal/server` and is auto-discovered by Netlify
+  # via its `path: "/*"` registration, with `preferStatic: true` so files
+  # under `dist/assets/` are served directly without invoking the Function.
   publish = "dist"
 
-# All non-asset paths → the SSR function. `force = false` lets static
-# assets (e.g. /assets/foo.js) serve directly from the publish dir.
-[[redirects]]
-  from = "/*"
-  to = "/.netlify/functions-internal/server"
-  status = 200
-  force = false
+# Note: earlier revisions had an explicit `/*` → `/.netlify/functions-internal/server`
+# rewrite here. That triggered the Function's own `excludedPath: ["/.netlify/*"]`
+# (the rewritten URL matched the exclusion) and produced 404s on every
+# page. The Function's built-in `path: "/*"` registration handles routing
+# without a rewrite, so no `[[redirects]]` block is needed here.
 
 # Security headers — mirror vercel.json so the deployed site gets the
 # same protections on Netlify that it gets on Vercel.

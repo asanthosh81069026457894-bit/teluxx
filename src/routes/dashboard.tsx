@@ -13,7 +13,6 @@ import { useCallback, useEffect, useRef, useState, type DragEvent } from "react"
 
 import { DashboardSubNav } from "@/components/dashboard-nav";
 import { AuthGate } from "@/components/AuthGate";
-import { BillingCard } from "@/components/BillingCard";
 import { ChatPanel } from "@/components/ChatPanel";
 import { DashboardStateProvider } from "@/components/dashboard-state";
 import { useAuth } from "@/hooks/useAuth";
@@ -87,7 +86,9 @@ function DashboardPage() {
   // falls back to documents so old bookmarks don't 404.
   const view: "chat" | "documents" | "multi" =
     viewRaw === "chat" || viewRaw === "multi" ? viewRaw : "documents";
-  const [mobileTab, setMobileTab] = useState<"documents" | "chat">(view === "chat" ? "chat" : "documents");
+  const [mobileTab, setMobileTab] = useState<"documents" | "chat">(
+    view === "chat" ? "chat" : "documents",
+  );
   const [isDragging, setIsDragging] = useState(false);
   const [ingestingId, setIngestingId] = useState<string | null>(null);
   // After the first successful upload, surface a quick CTA pointing at /talk.
@@ -107,7 +108,7 @@ function DashboardPage() {
       if (initial.paneB && !docIds.has(initial.paneB)) initial.paneB = "";
     }
     setPinSlots(initial);
-  }, [docs.length]);
+  }, [docs]);
 
   const setPanePin = useCallback((slot: "paneA" | "paneB", docId: string) => {
     setPinSlots((cur) => {
@@ -222,7 +223,6 @@ function DashboardPage() {
         <DashboardSubNav />
 
         <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-3 px-3 pb-6 pt-3 sm:px-6 sm:pt-6">
-          <BillingCard />
           {/* Mobile-only tab switcher. Three columns on small screens too:
               Documents / Chat / Multi. */}
           <div className="grid grid-cols-3 gap-1 rounded-xl border border-border bg-surface-2/40 p-1 text-xs lg:hidden">
@@ -381,18 +381,8 @@ function MultiPinStrip({ docs, paneA, paneB, onChange }: MultiPinStripProps) {
         </span>
       </header>
       <div className="grid gap-3 md:grid-cols-2">
-        <PinRow
-          label="Chat A"
-          docs={docs}
-          value={paneA}
-          onChange={(v) => onChange("paneA", v)}
-        />
-        <PinRow
-          label="Chat B"
-          docs={docs}
-          value={paneB}
-          onChange={(v) => onChange("paneB", v)}
-        />
+        <PinRow label="Chat A" docs={docs} value={paneA} onChange={(v) => onChange("paneA", v)} />
+        <PinRow label="Chat B" docs={docs} value={paneB} onChange={(v) => onChange("paneB", v)} />
       </div>
     </section>
   );
@@ -475,9 +465,7 @@ function DocumentsPanel({
         <UploadCloud className="size-7 text-signal sm:size-8" />
         <div>
           <p className="text-sm font-medium">Drag & drop a file here</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            PDF, TXT, MD up to ~10 MB
-          </p>
+          <p className="mt-1 text-xs text-muted-foreground">PDF, TXT, MD up to ~10 MB</p>
         </div>
         <span className="rounded-xl border border-input bg-background px-3 py-1.5 text-xs font-medium">
           Choose file

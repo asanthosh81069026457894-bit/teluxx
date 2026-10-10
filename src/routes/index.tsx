@@ -450,11 +450,13 @@ function Pricing() {
       <div className="mx-auto max-w-6xl px-5">
         <Reveal>
           <span className="eyebrow">Pricing</span>
-          <h2 className="mt-4 text-4xl font-bold md:text-5xl">Free today. Pro and Team on the way.</h2>
+          <h2 className="mt-4 text-4xl font-bold md:text-5xl">
+            Free today. Pro and Team on the way.
+          </h2>
           <p className="mt-4 max-w-xl text-muted-foreground">
-            Free is the full app — chat, voice, multi-document, unlimited pages. Pro and Team
-            tiers are listed below so you can see what&apos;s coming; they&apos;re not yet
-            available to buy.
+            Free is the full app — chat, voice, multi-document, unlimited pages. Pro and Team tiers
+            are listed below so you can see what&apos;s coming; they&apos;re not yet available to
+            buy.
           </p>
         </Reveal>
 

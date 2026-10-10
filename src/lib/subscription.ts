@@ -32,8 +32,8 @@ const FULL_ACCESS: SubscriptionSnapshot = {
   loading: false,
 };
 
-let cache: SubscriptionSnapshot = FULL_ACCESS;
-let loadedFor: string | null = null;
+const cache: SubscriptionSnapshot = FULL_ACCESS;
+const loadedFor: string | null = null;
 const listeners = new Set<() => void>();
 
 function emit() {

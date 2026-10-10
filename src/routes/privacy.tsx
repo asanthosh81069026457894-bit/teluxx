@@ -172,10 +172,9 @@ function PrivacyPage() {
                 title="Payments"
                 body={
                   <p>
-                    Paid plans are processed by our payment processor — they handle card data
-                    and billing. Telux never sees
-                    your card number. We only receive confirmation that a payment succeeded and your
-                    plan tier.
+                    Paid plans are processed by our payment processor — they handle card data and
+                    billing. Telux never sees your card number. We only receive confirmation that a
+                    payment succeeded and your plan tier.
                   </p>
                 }
               />

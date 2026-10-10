@@ -26,7 +26,9 @@ import { consumePendingSession, useAuth } from "@/hooks/useAuth";
 import { getOnboardingStatus } from "@/serverFns/onboarding";
 import { OnboardingModal } from "@/components/OnboardingModal";
 
-function readSessionFullName(session: { user?: { user_metadata?: Record<string, unknown> } } | null): string {
+function readSessionFullName(
+  session: { user?: { user_metadata?: Record<string, unknown> } } | null,
+): string {
   const meta = session?.user?.user_metadata as { full_name?: unknown } | undefined;
   const v = meta?.full_name;
   return typeof v === "string" ? v.trim() : "";
@@ -141,7 +143,9 @@ export function AuthGate({ children }: { children: ReactNode }) {
   // out of the onboarding state by forcing a re-render with the
   // updated gating decision below.
   useEffect(() => {
-    setOnboardingCompleted((prev) => (prev === false && readSessionFullName(session) ? true : prev));
+    setOnboardingCompleted((prev) =>
+      prev === false && readSessionFullName(session) ? true : prev,
+    );
   }, [session]);
 
   // Auth guard. We never redirect while a pending-session handshake is
@@ -181,9 +185,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   // serverFn has returned, we trust the auth-metadata fast path — the
   // dashboard should never be blocked waiting on a slow Supabase call.
   const showOnboarding =
-    onboardingResolved === true &&
-    onboardingCompleted === false &&
-    !readSessionFullName(session);
+    onboardingResolved === true && onboardingCompleted === false && !readSessionFullName(session);
 
   return (
     <>

@@ -258,9 +258,7 @@ export function useChatMessages(
     (next: ChatMessage[] | ((prev: ChatMessage[]) => ChatMessage[])) => {
       const current = getChatSnapshot(storageKey);
       const nextArr =
-        typeof next === "function"
-          ? (next as (p: ChatMessage[]) => ChatMessage[])(current)
-          : next;
+        typeof next === "function" ? (next as (p: ChatMessage[]) => ChatMessage[])(current) : next;
       chatMessagesByKey.set(storageKey, nextArr);
       persistChat(storageKey, nextArr);
       emitChat(storageKey);

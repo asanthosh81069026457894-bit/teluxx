@@ -23,24 +23,34 @@ From the project root:
 
 ```bash
 npm install
-npm run build
+npm run build           # Netlify preset (default; writes dist/ + .netlify/)
+npm run build:vercel    # Vercel preset (writes .vercel/output/)
+npm run build:cloudflare # Cloudflare preset (writes .output/)
 ```
 
-This runs `vite build`, which Nitro routes into the **netlify** preset
-(set in `vite.config.ts` → `nitro: { preset: "netlify" }`). The build
-writes:
+`npm run build` defaults to the Netlify preset (set in
+`vite.config.ts` → `nitro: { preset: "netlify" }`). The build writes:
 
-- `dist/` — static client assets (the "publish" folder).
+- `dist/` — static client assets (the publish folder).
 - `.netlify/functions-internal/server/` — the SSR Function (Functions v2).
 
-The previous build output (`.output/`, `.netlify/`, `dist/`) is overwritten
-on each run, so you can re-run `npm run build` any time.
+The previous build output (`.output/`, `.netlify/`, `.vercel/`, `dist/`)
+is overwritten on each run, so re-run `npm run build` any time.
 
 > **If the build hangs on the Nitro step or says `preset: cloudflare-module`**,
 > confirm `vite.config.ts` has `nitro: { preset: "netlify" }` at the
 > top level (not under `tanstackStart`). The Lovable plugin silently
 > moves the preset override to its bundled Cloudflare target if it lives
 > under `tanstackStart`.
+
+> **Why no `[[redirects]]` in `netlify.toml`?** The Nitro 3 Netlify preset
+> registers the SSR Function with `path: "/*"` and `preferStatic: true`.
+> An earlier revision of this file redirected every path to the Function
+> via `/*` → `/.netlify/functions-internal/server`, but the Function's own
+> `excludedPath: ["/.netlify/*"]` then matched the rewritten URL and
+> skipped itself, returning 404 on every page. The built-in `path: "/*"`
+> routing handles SSR invocation without a rewrite. `public/_redirects`
+> is intentionally empty (comments only) for the same reason.
 
 ---
 
@@ -55,6 +65,7 @@ on each run, so you can re-run `npm run build` any time.
 
    If you'd rather upload a zip, zip the project root (so both `dist/`
    and `.netlify/` are at the top level) and drag the zip.
+
 4. The first deploy **will succeed at building** but the live site will
    throw errors until you set the env vars (next step). That's expected.
 
@@ -70,15 +81,15 @@ scopes:
 - **Runtime scope**: variables available to the SSR Function when it
   runs on a request. Required for server-only secrets.
 
-| Variable | Scope | Required? | Where to get it |
-| --- | --- | --- | --- |
-| `VITE_SUPABASE_URL` | Build + runtime | Yes | Supabase → Project Settings → API → Project URL |
-| `VITE_SUPABASE_ANON_KEY` | Build + runtime | Yes | Supabase → Project Settings → API → `anon public` row |
-| `SUPABASE_SERVICE_ROLE_KEY` | Runtime only | Yes | Supabase → Project Settings → API → `service_role` row. **Never** prefix with `VITE_`. |
-| `GROQ_API_KEY` | Runtime only | Yes | <https://console.groq.com/keys> |
-| `GROQ_MODEL` | Runtime only | No | Defaults to `openai/gpt-oss-20b` |
-| `ELEVENLABS_API_KEY` | Runtime only | No | <https://elevenlabs.io>. Unset = browser SpeechSynthesis fallback. |
-| `ELEVENLABS_DEFAULT_VOICE_ID` | Runtime only | No | Defaults to `"21m00Tcm4TlvDq8ikWAM"` (Rachel) |
+| Variable                      | Scope           | Required? | Where to get it                                                                        |
+| ----------------------------- | --------------- | --------- | -------------------------------------------------------------------------------------- |
+| `VITE_SUPABASE_URL`           | Build + runtime | Yes       | Supabase → Project Settings → API → Project URL                                        |
+| `VITE_SUPABASE_ANON_KEY`      | Build + runtime | Yes       | Supabase → Project Settings → API → `anon public` row                                  |
+| `SUPABASE_SERVICE_ROLE_KEY`   | Runtime only    | Yes       | Supabase → Project Settings → API → `service_role` row. **Never** prefix with `VITE_`. |
+| `GROQ_API_KEY`                | Runtime only    | Yes       | <https://console.groq.com/keys>                                                        |
+| `GROQ_MODEL`                  | Runtime only    | No        | Defaults to `openai/gpt-oss-20b`                                                       |
+| `ELEVENLABS_API_KEY`          | Runtime only    | No        | <https://elevenlabs.io>. Unset = browser SpeechSynthesis fallback.                     |
+| `ELEVENLABS_DEFAULT_VOICE_ID` | Runtime only    | No        | Defaults to `"21m00Tcm4TlvDq8ikWAM"` (Rachel)                                          |
 
 After saving, go back to **Deploys** and click **Trigger deploy →
 Deploy site** (or **Clear cache and deploy** if you want a fresh build).
@@ -206,7 +217,7 @@ The redirect in `netlify.toml` (and the duplicate in `public/_redirects`)
 should catch this. If it doesn't:
 
 - Confirm the redirect still exists in `netlify.toml` (`to =
-  "/.netlify/functions-internal/server"`) and in `public/_redirects`.
+"/.netlify/functions-internal/server"`) and in `public/_redirects`.
 - Check that the publish directory in your Netlify settings is `dist`
   (matches `netlify.toml`). If it's been changed, restore it.
 - Hit **Clear cache and deploy** from the **Deploys** tab.
@@ -229,13 +240,22 @@ default; `groq/compound-mini` is also quieter than the full
 
 ## 6. Optional: Vercel instead
 
-If you'd rather deploy on Vercel, change one line in `vite.config.ts`:
+Vercel works out of the box:
 
-```ts
-nitro: { preset: "vercel" },
+```bash
+npm run build:vercel
 ```
 
-The `netlify.toml` is harmless on Vercel (it's only read by Netlify),
-and the existing `vercel.json` already covers the security headers and
-Vercel build settings. Then connect the GitHub repo in Vercel and set
-the same env vars under **Project Settings → Environment Variables**.
+This writes the Vercel preset output to `.vercel/output/`, which Vercel
+expects. The existing `vercel.json` already covers the security headers
+and build settings. Set the same env vars under **Project Settings →
+Environment Variables**.
+
+If you'd rather let the platform auto-build: connect the GitHub repo in
+Vercel with:
+
+- **Build command**: `npm run build:vercel`
+- **Output directory**: `.vercel/output`
+- **Install command**: `npm install`
+
+The `netlify.toml` is harmless on Vercel (it's only read by Netlify).

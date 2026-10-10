@@ -323,7 +323,9 @@ export async function writeOnboardingRow(
   },
 ): Promise<OnboardingRow> {
   if (!isSupabaseConfigured()) {
-    console.warn("[supabaseServer] writeOnboardingRow: Supabase not configured, returning synthetic row");
+    console.warn(
+      "[supabaseServer] writeOnboardingRow: Supabase not configured, returning synthetic row",
+    );
     const now = new Date().toISOString();
     return { user_id: userId, created_at: now, updated_at: now, ...patch };
   }

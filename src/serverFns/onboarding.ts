@@ -12,11 +12,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { consume } from "@/lib/rate-limit";
-import {
-  isSupabaseConfigured,
-  readOnboardingRow,
-  writeOnboardingRow,
-} from "@/lib/supabaseServer";
+import { isSupabaseConfigured, readOnboardingRow, writeOnboardingRow } from "@/lib/supabaseServer";
 
 const answersSchema = z.object({
   userId: z.string().uuid(),
@@ -62,9 +58,7 @@ export const submitOnboarding = createServerFn({ method: "POST" })
       throw new Error("Slow down — please wait a minute before resubmitting.");
     }
     if (!isSupabaseConfigured()) {
-      throw new Error(
-        "The backend isn't reachable right now. Please try again in a moment.",
-      );
+      throw new Error("The backend isn't reachable right now. Please try again in a moment.");
     }
     await writeOnboardingRow(data.userId, {
       full_name: data.fullName,

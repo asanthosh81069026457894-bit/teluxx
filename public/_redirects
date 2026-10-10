@@ -1,9 +1,15 @@
-# SPA fallback — every unmatched path goes to the SSR function. The
-# netlify.toml already declares this redirect, but having a public/_redirects
-# file is a belt-and-braces measure that keeps the rewrite working even if
-# the netlify.toml redirect ever gets removed from the build.
+# Public _redirects intentionally empty.
 #
-# Nitro 3's Netlify preset writes the SSR handler to
-# `.netlify/functions-internal/server` (Functions v2). Plain `/.netlify/functions/...`
-# paths go to the Functions v1 router which no longer applies.
-/*    /.netlify/functions-internal/server   200
+# Earlier revisions redirected `/*` to `/.netlify/functions-internal/server`
+# to invoke the SSR Function. That triggered Netlify's `excludedPath:
+# ["/.netlify/*"]` rule on the Function itself (the rewritten URL matched
+# its own exclusion and the Function returned 404).
+#
+# The modern Nitro preset registers the SSR Function with
+# `path: "/*"` and `preferStatic: true`, so Netlify already routes every
+# non-asset request to it without a rewrite. Static assets under
+# /assets/ are served from `dist/` first via `preferStatic`.
+#
+# Keep this file present (empty) so Nitro doesn't add its own fallback
+# _redirects on top of ours — it short-circuits with "Not adding Nitro
+# fallback to _redirects (as an existing fallback was found)".

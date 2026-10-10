@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
-    "build:dev": "vite build --mode development",
+    "build": "node scripts/build.mjs",
+    "build:dev": "node scripts/build.mjs --mode development",
+    "build:netlify": "node scripts/build.mjs --preset netlify",
+    "build:vercel": "node scripts/build.mjs --preset vercel",
+    "build:cloudflare": "node scripts/build.mjs --preset cloudflare-module",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",

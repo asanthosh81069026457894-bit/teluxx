@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { loadDocuments, type StoredDocument } from "@/lib/documents";
 
 // Tiny subscription hook — re-reads from IndexedDB whenever some other part of
@@ -8,20 +8,20 @@ import { loadDocuments, type StoredDocument } from "@/lib/documents";
 export function useDocuments(userId?: string): { docs: StoredDocument[]; refresh: () => void } {
   const [docs, setDocs] = useState<StoredDocument[]>([]);
 
-  const refresh = () => {
+  const refresh = useCallback(() => {
     if (!userId) {
       setDocs([]);
       return;
     }
     void loadDocuments(userId).then(setDocs);
-  };
+  }, [userId]);
 
   useEffect(() => {
     refresh();
     const handler = () => refresh();
     window.addEventListener("telux:documents-changed", handler);
     return () => window.removeEventListener("telux:documents-changed", handler);
-  }, [userId]);
+  }, [refresh]);
 
   return { docs, refresh };
 }

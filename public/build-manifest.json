@@ -1,0 +1,9 @@
+{
+  "builtAt": "2026-10-10T08:36:59.072Z",
+  "preset": "netlify",
+  "mode": "production",
+  "viteVarFingerprints": {
+    "VITE_SUPABASE_URL": "https:…e.co",
+    "VITE_SUPABASE_ANON_KEY": "eyJhbG…h97c"
+  }
+}

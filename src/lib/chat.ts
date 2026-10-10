@@ -262,9 +262,7 @@ export const askChat = createServerFn({ method: "POST" })
           Number.isFinite(parsed) && parsed > 0
             ? ` Try again in about ${Math.ceil(parsed)}s.`
             : " Try again in a moment.";
-        throw new Error(
-          `The chat is busy right now (rate limit reached on the model).${waitHint}`,
-        );
+        throw new Error(`The chat is busy right now (rate limit reached on the model).${waitHint}`);
       }
       // 413 -- combined prompt + history + tool definitions exceed the
       // model's per-request body cap. With the input caps above this
@@ -288,7 +286,8 @@ export const askChat = createServerFn({ method: "POST" })
     // fallback instead of "OK" or "." which look like a bug to the user.
     if (rawAnswer.length < 5) {
       return {
-        answer: "I couldn't generate an answer. Try rephrasing your question or upload a clearer section.",
+        answer:
+          "I couldn't generate an answer. Try rephrasing your question or upload a clearer section.",
         usedChunks: topChunks.length,
       };
     }

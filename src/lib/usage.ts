@@ -107,11 +107,7 @@ export function planHasPremium(_plan: Plan): boolean {
 }
 
 /** Always true — every signed-in user has voice. */
-export function canUseVoice(
-  _plan: Plan,
-  _docCount: number,
-  _planOverride?: Plan,
-): boolean {
+export function canUseVoice(_plan: Plan, _docCount: number, _planOverride?: Plan): boolean {
   return true;
 }
 

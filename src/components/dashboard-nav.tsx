@@ -1,6 +1,8 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { LogOut, Mic, ScrollText } from "lucide-react";
 
+import { LanguagePicker } from "@/components/LanguagePicker";
+import { VoicePicker } from "@/components/VoicePicker";
 import { useAuth } from "@/hooks/useAuth";
 
 // Top sub-nav used inside every /dashboard/* page. Replaces the old side menu.
@@ -57,7 +59,9 @@ export function DashboardSubNav() {
           </TabLink>
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <LanguagePicker />
+          <VoicePicker />
           {user?.email ? (
             <span className="hidden max-w-[160px] truncate text-[11px] text-muted-foreground lg:inline">
               {user.email}

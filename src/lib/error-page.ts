@@ -6,9 +6,7 @@ export function renderErrorPage(detail?: unknown): string {
   const isDev = typeof process !== "undefined" && process.env?.NODE_ENV !== "production";
   const safeMessage =
     detail instanceof Error
-      ? detail.message.replace(/[<>&]/g, (c) =>
-          c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&amp;",
-        )
+      ? detail.message.replace(/[<>&]/g, (c) => (c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&amp;"))
       : "";
   const safeStack =
     detail instanceof Error && detail.stack
@@ -17,9 +15,7 @@ export function renderErrorPage(detail?: unknown): string {
           .slice(0, 8)
           .map((line) =>
             line
-              .replace(/[<>&]/g, (c) =>
-                c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&amp;",
-              )
+              .replace(/[<>&]/g, (c) => (c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&amp;"))
               .trim(),
           )
           .filter(Boolean)

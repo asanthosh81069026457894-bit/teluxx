@@ -10,8 +10,10 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-.output
-.vinxi
+.output/
+.netlify/
+.vercel/
+.vinxi/
 .tanstack/**
 .nitro
 *.local

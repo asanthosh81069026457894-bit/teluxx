@@ -45,8 +45,7 @@ export function OnboardingModal() {
   // Pre-fill full name from Supabase user_metadata when present (typical for
   // the password signup flow). Google OAuth often leaves it blank — the user
   // can still type it in.
-  const initialName =
-    (session?.user?.user_metadata?.full_name as string | undefined)?.trim() ?? "";
+  const initialName = (session?.user?.user_metadata?.full_name as string | undefined)?.trim() ?? "";
 
   const [fullName, setFullName] = useState(initialName);
   const [replyLang, setReplyLang] = useState<string>(DEFAULT_LANG);

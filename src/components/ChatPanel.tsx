@@ -35,6 +35,7 @@ import { toast } from "sonner";
 
 import { clearChatMessages, useChatMessages, type ChatMessage } from "@/components/dashboard-state";
 import { LanguagePicker } from "@/components/LanguagePicker";
+import { VoicePicker } from "@/components/VoicePicker";
 import { useAuth } from "@/hooks/useAuth";
 import type { useDocuments } from "@/hooks/useDocuments";
 import { useSpeech } from "@/hooks/useSpeech";
@@ -105,10 +106,7 @@ export function ChatPanel({
   // The Parallel tab passes `paneId` so each pane reads its own key.
   // We also pass `userId` so two accounts on the same device see
   // separate scrollback.
-  const { messages, setMessages } = useChatMessages(
-    paneId ?? undefined,
-    userId ?? undefined,
-  );
+  const { messages, setMessages } = useChatMessages(paneId ?? undefined, userId ?? undefined);
 
   // First-time seed: when the user opens the chat for the very first
   // time (no persisted history), they should see a personalised
@@ -373,12 +371,15 @@ export function ChatPanel({
     [replyLang],
   );
 
-  const handleFeedback = useCallback((msgId: string, next: "up" | "down") => {
-    setMessages((cs) =>
-      cs.map((m) => (m.id === msgId ? { ...m, feedback: m.feedback === next ? null : next } : m)),
-    );
-    console.info("[chat-feedback]", { msgId, value: next });
-  }, []);
+  const handleFeedback = useCallback(
+    (msgId: string, next: "up" | "down") => {
+      setMessages((cs) =>
+        cs.map((m) => (m.id === msgId ? { ...m, feedback: m.feedback === next ? null : next } : m)),
+      );
+      console.info("[chat-feedback]", { msgId, value: next });
+    },
+    [setMessages],
+  );
 
   // Clear the conversation. Wipes both the in-memory store and the
   // localStorage entry behind this (paneId, userId) pair, so other panes
@@ -397,29 +398,30 @@ export function ChatPanel({
     // Re-seed the personalised greeting so the user lands on a friendly
     // empty state instead of a blank chat. `messages.length === 0` then
     // triggers the same `useEffect` below on the next render.
-    setMessages([
-      { id: "m1", role: "assistant", text: greetingText },
-    ]);
+    setMessages([{ id: "m1", role: "assistant", text: greetingText }]);
     toast.success(firstName ? "Chat cleared." : "Chat cleared.");
   }, [messages.length, paneId, userId, firstName, greetingText, setMessages]);
 
-  const handleRegenerate = useCallback(async (msgId: string) => {
-    const list = messagesRef.current;
-    const idx = list.findIndex((m) => m.id === msgId);
-    if (idx < 0) return;
-    let prevUserIdx = -1;
-    for (let i = idx - 1; i >= 0; i--) {
-      if (list[i].role === "user") {
-        prevUserIdx = i;
-        break;
+  const handleRegenerate = useCallback(
+    async (msgId: string) => {
+      const list = messagesRef.current;
+      const idx = list.findIndex((m) => m.id === msgId);
+      if (idx < 0) return;
+      let prevUserIdx = -1;
+      for (let i = idx - 1; i >= 0; i--) {
+        if (list[i].role === "user") {
+          prevUserIdx = i;
+          break;
+        }
       }
-    }
-    if (prevUserIdx < 0) return;
-    const prompt = list[prevUserIdx].text;
-    const before = list.slice(0, idx);
-    setMessages(before);
-    await runAskRef.current(prompt, { skipUserMsg: true });
-  }, []);
+      if (prevUserIdx < 0) return;
+      const prompt = list[prevUserIdx].text;
+      const before = list.slice(0, idx);
+      setMessages(before);
+      await runAskRef.current(prompt, { skipUserMsg: true });
+    },
+    [setMessages],
+  );
 
   return (
     <section className="flex min-h-[55vh] flex-col gap-3 rounded-2xl border border-border bg-surface-2/30 p-3.5 sm:p-5 lg:min-h-0">
@@ -432,26 +434,10 @@ export function ChatPanel({
               {pinnedDocName}
             </span>
           ) : null}
-          <span className="inline-flex items-center gap-1 rounded-full border border-border bg-surface-2/60 px-2 py-0.5 text-[10px] text-muted-foreground">
-            <span
-              className={
-                "size-1.5 rounded-full " +
-                (replyLang === DEFAULT_LANG
-                  ? "bg-emerald-500"
-                  : replyLang.endsWith("-IN")
-                    ? "bg-signal"
-                    : "bg-amber-500")
-              }
-              aria-hidden
-            />
-            <span>
-              Replying in{" "}
-              <span className="font-medium text-foreground">{nativeForLang(replyLang)}</span>
-            </span>
-          </span>
         </div>
         <div className="flex items-center gap-2">
           <LanguagePicker />
+          <VoicePicker />
           {messages.length > 0 ? (
             <button
               type="button"
@@ -480,10 +466,7 @@ export function ChatPanel({
           // longer has to walk the full array on every render.
           const isLastAssistant =
             isAssistant &&
-            idx ===
-              messages.findLastIndex(
-                (cur) => cur.role === "assistant" && !cur.error,
-              );
+            idx === messages.findLastIndex((cur) => cur.role === "assistant" && !cur.error);
           const cp = lookupChatCopy(replyLang);
           return (
             <div
@@ -571,9 +554,7 @@ export function ChatPanel({
                         }
                       }}
                       aria-label={speech.speakingId === m.id ? "Stop reading" : "Read aloud"}
-                      title={
-                        speech.speakingId === m.id ? "Stop reading" : "Read aloud"
-                      }
+                      title={speech.speakingId === m.id ? "Stop reading" : "Read aloud"}
                       className={
                         "inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 align-middle text-[10px] font-medium transition-colors " +
                         (speech.speakingId === m.id
@@ -689,21 +670,16 @@ export function ChatPanel({
       ) : null}
       {hasDocs ? (
         pinnedDocId && pinnedDocs.length === 1 ? (
-          <p
-            aria-live="polite"
-            className="mt-1.5 px-1 text-[11px] text-muted-foreground"
-          >
+          <p aria-live="polite" className="mt-1.5 px-1 text-[11px] text-muted-foreground">
             <FileText className="mr-1 inline-block size-3 -translate-y-px text-signal" />
-            Answering from <span className="font-medium text-foreground">{pinnedDocName}</span> only.
+            Answering from <span className="font-medium text-foreground">{pinnedDocName}</span>{" "}
+            only.
           </p>
         ) : docs.length > 1 ? (
-          <p
-            aria-live="polite"
-            className="mt-1.5 px-1 text-[11px] text-muted-foreground"
-          >
+          <p aria-live="polite" className="mt-1.5 px-1 text-[11px] text-muted-foreground">
             <FileText className="mr-1 inline-block size-3 -translate-y-px text-signal" />
-            Asking across <span className="font-medium text-foreground">{docs.length}</span> documents
-            on this device.
+            Asking across <span className="font-medium text-foreground">{docs.length}</span>{" "}
+            documents on this device.
           </p>
         ) : null
       ) : null}
