@@ -10,6 +10,8 @@
     "build:netlify": "node scripts/build.mjs --preset netlify",
     "build:vercel": "node scripts/build.mjs --preset vercel",
     "build:cloudflare": "node scripts/build.mjs --preset cloudflare-module",
+    "build:render": "node scripts/build.mjs --preset node-server",
+    "start": "node .output/server/index.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
